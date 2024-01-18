@@ -36,11 +36,15 @@
     <input style="display:none;" type="file" id="file" onchange="loadImageFromFile();" accept=".jpg,.jpeg,.png,.bmp" />
     <label>
       Width:
-      <input type="number" id="widthInput">
+      <input type="number" onfocus="this.oldvalue = this.value;" id="widthInput">
     </label>
     <label>
       Height:
-      <input type="number" id="heightInput">
+      <input type="number" onfocus="this.oldvalue = this.value;" id="heightInput">
+    </label>
+    <label>
+      Keep aspect:
+      <input type="checkbox" id="keepAspectCheckbox">
     </label>
     <button id="resizeButton">Resize</button>
     <div class="imageContainer">
@@ -50,6 +54,9 @@
     <canvas id="canvasHidden"></canvas>
   </div>
   <script>
+    let widthInput = document.getElementById("widthInput");
+    let heightInput = document.getElementById("heightInput");
+
     document.getElementById("loadFileButton").addEventListener("click",function(){
       document.getElementById("file").click();
     })
@@ -57,6 +64,35 @@
     document.getElementById("resizeButton").addEventListener("click",function(){
       document.getElementById("file").click();
     })
+
+    widthInput.addEventListener("change",function(e){
+      console.log(e);
+      if (document.getElementById("keepAspectCheckbox").checked) {
+        syncSize(widthInput.oldvalue,heightInput.oldvalue,widthInput.value,undefined);
+      }
+      this.oldvalue = this.value;
+    })
+
+    heightInput.addEventListener("change",function(e){
+      console.log(e);
+      if (document.getElementById("keepAspectCheckbox").checked) {
+        syncSize(widthInput.oldvalue,heightInput.oldvalue,undefined,heightInput.value);
+      }
+      this.oldvalue = this.value;
+    })
+
+    function syncSize(oldWidth, oldHeight, newWidth, newHeight){
+      if (oldWidth && oldHeight) {
+        const ratio = oldWidth/oldHeight;
+        if (newWidth) {
+          newHeight = newWidth/ratio;
+          heightInput.value = parseInt(newHeight);
+        }else if (newHeight) {
+          newWidth = newHeight * ratio;
+          widthInput.value = parseInt(newWidth);
+        }
+      }
+    }
 
     function loadImageFromFile(){
       let fileInput = document.getElementById("file");
@@ -69,8 +105,10 @@
       fileReader.onload = function(e){
         document.getElementById("image").src = e.target.result;
         document.getElementById("imageHidden").onload = function(){
-          document.getElementById("widthInput").value = document.getElementById("imageHidden").naturalWidth;
-          document.getElementById("heightInput").value = document.getElementById("imageHidden").naturalHeight;
+          widthInput.value = document.getElementById("imageHidden").naturalWidth;
+          heightInput.value = document.getElementById("imageHidden").naturalHeight;
+          widthInput.oldvalue = widthInput.value;
+          heightInput.oldvalue = heightInput.value;
         }
         document.getElementById("imageHidden").src = e.target.result;
       };
