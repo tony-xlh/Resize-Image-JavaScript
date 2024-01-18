@@ -44,6 +44,17 @@
       Keep aspect:
       <input type="checkbox" id="keepAspectCheckbox">
     </label>
+    <label>
+      Preset resolutions:
+      <select id="presetSelect">
+        <option value="2480x3508">A4 300 DPI</option>
+        <option value="1654x2339">A4 200 DPI</option>
+        <option value="827x1169">A4 100 DPI</option>
+        <option value="1013x638">ID Card 300 DPI</option>
+        <option value="676x425">ID Card 200 DPI</option>
+        <option value="338x213">ID Card 100 DPI</option>
+      </select>
+    </label>
     <br/>
     <label>
       Method:
@@ -95,6 +106,11 @@
       toggleControlsForDWT();
     })
 
+    document.getElementById("presetSelect").selectedIndex = -1;
+    document.getElementById("presetSelect").addEventListener("change",async function(e){
+      usePreset();
+    })
+
     widthInput.addEventListener("change",function(e){
       console.log(e);
       if (document.getElementById("keepAspectCheckbox").checked) {
@@ -123,6 +139,16 @@
           widthInput.value = parseInt(newWidth);
           widthInput.oldvalue = widthInput.value;
         }
+      }
+    }
+
+    function usePreset(){
+      let presetSelect = document.getElementById("presetSelect");
+      if (presetSelect.selectedIndex != -1) {
+        let selectedOption = presetSelect.selectedOptions[0];
+        widthInput.value = selectedOption.value.split("x")[0];
+        heightInput.value = selectedOption.value.split("x")[1];
+        presetSelect.selectedIndex = -1;
       }
     }
 
