@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resize an Image with JavaScript</title>
+  <style>
+  .home {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .imageContainer {
+    overflow: auto;
+  }
+
+  #imageHidden {
+    display: none;
+  }
+
+  #canvasHidden {
+    display: none;
+  }
+  
+  input[type=number] {
+    max-width: 50px;
+  }
+  </style>
+</head>
+<body>
+  <div class="home">
+    <h2>Rotate an Image</h2>
+    <button id="loadFileButton">Load a File</button>
+    <input style="display:none;" type="file" id="file" onchange="loadImageFromFile();" accept=".jpg,.jpeg,.png,.bmp" />
+    <label>
+      Width:
+      <input type="number" id="widthInput">
+    </label>
+    <label>
+      Height:
+      <input type="number" id="heightInput">
+    </label>
+    <button id="resizeButton">Resize</button>
+    <div class="imageContainer">
+      <img id="image"/>
+      <img id="imageHidden"/>
+    </div>
+    <canvas id="canvasHidden"></canvas>
+  </div>
+  <script>
+    document.getElementById("loadFileButton").addEventListener("click",function(){
+      document.getElementById("file").click();
+    })
+
+    document.getElementById("resizeButton").addEventListener("click",function(){
+      document.getElementById("file").click();
+    })
+
+    function loadImageFromFile(){
+      let fileInput = document.getElementById("file");
+      let files = fileInput.files;
+      if (files.length == 0) {
+        return;
+      }
+      let file = files[0];
+      fileReader = new FileReader();
+      fileReader.onload = function(e){
+        document.getElementById("image").src = e.target.result;
+        document.getElementById("imageHidden").onload = function(){
+          document.getElementById("widthInput").value = document.getElementById("imageHidden").naturalWidth;
+          document.getElementById("heightInput").value = document.getElementById("imageHidden").naturalHeight;
+        }
+        document.getElementById("imageHidden").src = e.target.result;
+      };
+      fileReader.onerror = function () {
+        console.warn('oops, something went wrong.');
+      };
+      fileReader.readAsDataURL(file);
+    }
+
+    function resizeImage(){
+      const canvas = document.getElementById("canvasHidden");
+      const imgWidth = imageHidden.naturalWidth;
+      const imgHeight = imageHidden.naturalHeight;
+      const rect = getBoundingRect(imgWidth,imgHeight,degree);
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      const ctx = canvas.getContext("2d");
+      ctx.translate(canvas.width/2,canvas.height/2);
+      ctx.rotate(Degree2Rad(degree));
+      ctx.drawImage(imageHidden, -imgWidth/2, -imgHeight/2);
+      image.src = canvas.toDataURL();
+    }
+
+  </script>
+</body>
+</html>
